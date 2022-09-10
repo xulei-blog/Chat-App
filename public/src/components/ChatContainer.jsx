@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import ChatInput from './ChatInput'
 import Logout from './Logout'
-import axios from 'axios'
+import request from '../service/request'
 import { sendMessageRoute, getAllMessagesRoute } from '../utils/APIRoutes'
 import {v4 as uuidv4} from 'uuid'
 
@@ -12,7 +12,7 @@ function ChatContainer({ currentChat, currentUser, socket }) {
   const scrollRef = useRef();
   useEffect(() => {
     (async () => {
-      const { data } = await axios.post(getAllMessagesRoute, {
+      const { data } = await request.post(getAllMessagesRoute, {
         from: currentUser._id,
         to: currentChat._id,
       });
@@ -21,7 +21,7 @@ function ChatContainer({ currentChat, currentUser, socket }) {
   }, [currentChat, currentUser]);
 
   const handleSendMsg = async (msg) => {
-    await axios.post(sendMessageRoute, {
+    await request.post(sendMessageRoute, {
       message: msg,
       from: currentUser._id,
       to: currentChat._id,

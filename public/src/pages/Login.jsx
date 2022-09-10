@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import Logo from '../assets/logo.svg'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import axios from 'axios'
+import request from '../service/request'
 import {loginRoute} from '../utils/APIRoutes'
 
 function Login() {
@@ -24,7 +24,7 @@ function Login() {
   }
 
   useEffect(() => {
-    if (localStorage.getItem('chat-app-user')) {
+    if (localStorage.getItem('chat-app-token')) {
       navigate('/');
     }
   }, []);
@@ -33,7 +33,7 @@ function Login() {
     e.preventDefault();
     if (handleValidation()) {
       const { password, username } = values;
-      const {data} = await axios.post(loginRoute, {
+      const {data} = await request.post(loginRoute, {
         username,
         password
       });

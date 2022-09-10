@@ -1,5 +1,8 @@
 const User = require('../model/usersModel');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+const { SECRET_KEY } = require('../token/constant');
 
 module.exports.register = async (req, res, next) => {
   try {
@@ -17,7 +20,11 @@ module.exports.register = async (req, res, next) => {
       password: hashedPassword,
     });
     delete user.password;
-    return res.json({ status: true, user });
+    let token = jwt.sign({ username, hashedPassword }, SECRET_KEY, {
+      expiresIn: 24 * 60 * 60,
+      algorithm: 'HS256'
+    });
+    return res.json({ status: true, user, token });
   } catch (ex) {
     next(ex);
   }
@@ -31,13 +38,17 @@ module.exports.login = async (req, res, next) => {
       return res.json({ msg: 'Incorrect username or password', status: false });
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.json({msg: 'Incorrect username or password', status: false});
+      return res.json({ msg: 'Incorrect username or password', status: false });
     }
-    delete user.password;
-    return res.json({ status: true, user });
-  } catch (ex) {
-    next(ex);
-  }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    let token = jwt.sign({ username, hashedPassword }, SECRET_KEY, {
+      expiresIn: 24 * 60 * 60,
+      algorithm: 'HS256'
+    });
+    return res.json({ status: true, token, user});
+} catch (ex) {
+  next(ex);
+}
 }
 
 module.exports.setAvatar = async (req, res, next) => {
@@ -48,7 +59,7 @@ module.exports.setAvatar = async (req, res, next) => {
       isAvatarImageSet: true,
       avatarImage,
     });
-    return res.json({isSet:userData.isAvatarImageSet, image: userData.avatarImage});
+    return res.json({ isSet: userData.isAvatarImageSet, image: userData.avatarImage });
   } catch (ex) {
     next(ex)
   }
@@ -56,10 +67,10 @@ module.exports.setAvatar = async (req, res, next) => {
 
 module.exports.getAllUsers = async (req, res, next) => {
   try {
-    const users = await User.find({_id: {$ne: req.params.id}}).select([
+    const users = await User.find({ _id: { $ne: req.params.id } }).select([
       "email", 'username', 'avatarImage', 'id',
     ]);
-    
+
     return res.json(users);
   } catch (ex) {
     next(ex);

@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import Logo from '../assets/logo.svg'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import axios from 'axios'
+import request from '../service/request'
 import {registerRoute} from '../utils/APIRoutes'
 
 function Register() {
@@ -25,17 +25,17 @@ function Register() {
     theme: 'dark'
   }
 
-  useEffect(() => {
-    if (localStorage.getItem('chat-app-user')) {
-      navigate('/');
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (localStorage.getItem('chat-app-token')) {
+  //     navigate('/');
+  //   }
+  // }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (handleValidation()) {
       const { password, username, email } = values;
-      const {data} = await axios.post(registerRoute, {
+      const {data} = await request.post(registerRoute, {
         username,
         email,
         password

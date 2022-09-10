@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import styled from 'styled-components'
-import axios from 'axios'
+import request from '../service/request';
 import { useNavigate } from 'react-router-dom'
 import { allUsersRoute } from '../utils/APIRoutes'
 import Contacts from '../components/Contacts'
@@ -18,7 +18,7 @@ function Chat() {
   const [isLoaded, setIsLoaded] = useState(false);
   useEffect(() => {
     (async () => {
-      if (!localStorage.getItem('chat-app-user')) {
+      if (!(localStorage.getItem('chat-app-user') && localStorage.getItem('chat-app-token'))) {
         navigate('/login');
       } else {
         setCurrentUser(await JSON.parse(localStorage.getItem('chat-app-user')));
@@ -30,7 +30,7 @@ function Chat() {
     (async () => {
       if (currentUser) {
         if (currentUser.isAvatarImageSet) {
-          const { data } = await axios.get(`${allUsersRoute}/${currentUser._id}`);
+          const { data } = await request.get(`${allUsersRoute}/${currentUser._id}`);
           setContacts(data);
         } else {
           navigate("/setAvatar");

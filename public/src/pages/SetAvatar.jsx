@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import Loader from '../assets/loader.gif'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import axios from 'axios'
+import request from '../service/request'
 import { setAvatarRoute } from '../utils/APIRoutes'
 import { Buffer } from 'buffer';
 import { avatarList } from '../utils/AvatarList';
@@ -25,7 +25,7 @@ function SetAvatar() {
   }
 
   useEffect(() => {
-    if (!localStorage.getItem('chat-app-user')) {
+    if (!(localStorage.getItem('chat-app-token') && localStorage.getItem('chat-app-user'))) {
       navigate('/login');
     }
   }, []);
@@ -35,7 +35,7 @@ function SetAvatar() {
       toast.error('Please select an avatar', toastOption);
     } else {
       const user = JSON.parse(localStorage.getItem('chat-app-user'));
-      const {data} = await axios.post(`${setAvatarRoute}/${user._id}`, {
+      const {data} = await request.post(`${setAvatarRoute}/${user._id}`, {
         image: avatars[selectedAvatar],
       })
 
@@ -54,8 +54,8 @@ function SetAvatar() {
     (async () => {
       const data = [];
       for (let i = 0; i < 4; i++) {
-        const image = await axios.get(`${api}/${avatarList[i]}`);
-        const buffer = new Buffer(image.data);
+        const image = await request.get(`${api}/${avatarList[i]}`);
+        const buffer = Buffer.from(image.data);
         data.push(buffer.toString('base64'));
       }
       setAvatars(data);
