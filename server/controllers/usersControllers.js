@@ -1,8 +1,7 @@
 const User = require('../model/usersModel');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 
-const { SECRET_KEY } = require('../token/constant');
+const { genToken } = require('../token/util')
 
 module.exports.register = async (req, res, next) => {
   try {
@@ -20,11 +19,15 @@ module.exports.register = async (req, res, next) => {
       password: hashedPassword,
     });
     delete user.password;
-    let token = jwt.sign({ username, hashedPassword }, SECRET_KEY, {
+    let token = genToken({username, hashedPassword}, {
       expiresIn: 24 * 60 * 60,
       algorithm: 'HS256'
     });
-    return res.json({ status: true, user, token });
+    res.cookie('token', token, {
+      maxAge: 1000 * 60 * 60 * 24,
+      path: '/',
+    })
+    return res.json({ status: true, user});
   } catch (ex) {
     next(ex);
   }
@@ -41,11 +44,20 @@ module.exports.login = async (req, res, next) => {
       return res.json({ msg: 'Incorrect username or password', status: false });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
-    let token = jwt.sign({ username, hashedPassword }, SECRET_KEY, {
+    // let token = jwt.sign({ username, hashedPassword }, SECRET_KEY, {
+    //   expiresIn: 24 * 60 * 60,
+    //   algorithm: 'HS256'
+    // });
+    let token = genToken({username, hashedPassword}, {
       expiresIn: 24 * 60 * 60,
       algorithm: 'HS256'
     });
-    return res.json({ status: true, token, user});
+    res.cookie('token', token, {
+      maxAge: 1000 * 60 * 60 * 24,
+      path: '/',
+      httpOnly: true,
+    })
+    return res.json({ status: true, user});
 } catch (ex) {
   next(ex);
 }

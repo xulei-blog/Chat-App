@@ -25,7 +25,7 @@ function SetAvatar() {
   }
 
   useEffect(() => {
-    if (!(localStorage.getItem('chat-app-token') && localStorage.getItem('chat-app-user'))) {
+    if (! localStorage.getItem('chat-app-user')) {
       navigate('/login');
     }
   }, []);

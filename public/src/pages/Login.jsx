@@ -23,11 +23,11 @@ function Login() {
     theme: 'dark'
   }
 
-  useEffect(() => {
-    if (localStorage.getItem('chat-app-token')) {
-      navigate('/');
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (localStorage.getItem('chat-app-token')) {
+  //     navigate('/');
+  //   }
+  // }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
