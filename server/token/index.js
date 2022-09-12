@@ -12,7 +12,7 @@ const jwtauth = expressjwt({
   path:
     [
       '/api/auth/register',
-      // '/api/auth/login'
+      '/api/auth/login'
     ]
 });
 
